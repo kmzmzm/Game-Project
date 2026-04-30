@@ -1,34 +1,37 @@
 using UnityEngine;
 
-public enum GameState
+namespace Arcana.Core
 {
-    Boot,
-    MainMenu,
-    Hub,
-    InGame,
-    Paused,
-    GameOver
-}
-
-public class GameManager : MonoBehaviour
-{
-    public static GameManager Instance { get; private set; }
-
-    public GameState CurrentState { get; private set; }
-
-    void Awake()
+    public enum GameState
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
+        Boot,
+        MainMenu,
+        Hub,
+        InGame,
+        Paused,
+        GameOver
     }
 
-    public void ChangeState(GameState newState)
+    public class GameManager : MonoBehaviour
     {
-        CurrentState = newState;
+        public static GameManager Instance { get; private set; }
+
+        public GameState CurrentState { get; private set; }
+
+        void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+
+        public void ChangeState(GameState newState)
+        {
+            CurrentState = newState;
+        }
     }
 }
