@@ -47,6 +47,13 @@ namespace Arcana.Player
             _stats      = GetComponent<PlayerStats>();
             _controller = GetComponent<PlayerController>();
             _animator   = GetComponentInChildren<Animator>();
+
+            if (_stats == null)
+                Debug.LogWarning("[PlayerCombat] PlayerStats 컴포넌트를 찾을 수 없습니다.", this);
+            if (_controller == null)
+                Debug.LogWarning("[PlayerCombat] PlayerController 컴포넌트를 찾을 수 없습니다.", this);
+            if (_animator == null)
+                Debug.LogWarning("[PlayerCombat] Animator 컴포넌트를 찾을 수 없습니다.", this);
         }
 
         void Start()
@@ -70,14 +77,15 @@ namespace Arcana.Player
         // Send Messages — 기본 공격
         void OnAttack(InputValue value)
         {
+            if (_controller == null) return;
             if (_controller.InputBlocked || _isAttacking) return;
             if (_stats.CurrentStamina < attackStaminaCost) return;
 
             _stats.UseStamina(attackStaminaCost);
             _controller.ResetStaminaDelay();
 
-            _animator.SetInteger("ComboIndex", _comboIndex);
-            _animator.SetTrigger("Attack");
+            _animator?.SetInteger("ComboIndex", _comboIndex);
+            _animator?.SetTrigger("Attack");
             _isAttacking = true;
         }
 

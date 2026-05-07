@@ -11,17 +11,13 @@ namespace Arcana.Core
         // 메인 메뉴 전환 전 대기 시간 (초)
         const float DelayBeforeMainMenu = 1f;
 
-        void Awake()
-        {
-            // 같은 GameObject의 다른 컴포넌트들은 Awake 순서가 컴포넌트 배치 순서를 따름
-            // BootInitializer는 마지막에 배치되므로 이 시점에 매니저 인스턴스가 모두 준비되어 있어야 함
-            ValidateManagers();
-        }
+        void Awake() { }
 
         void Start()
         {
-            // Awake에서 SaveManager가 Load()를 호출하지만,
-            // Start에서 GameState를 Boot로 명시 후 전환 흐름 시작
+            // 모든 오브젝트의 Awake가 끝난 뒤 Start에서 검증 — 매니저 인스턴스 초기화 완료 보장
+            ValidateManagers();
+
             GameManager.Instance.ChangeState(GameState.Boot);
 
             StartCoroutine(TransitionToMainMenu());
