@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0ae2affbe759704f8d3360a0094163d, type: 3}
   m_Name: RoomData_Elite
   m_EditorClassIdentifier: Assembly-CSharp::Arcana.Systems.RoomData
-  _roomType: 0
-  _roomPrefab: {fileID: 0}
+  _roomType: 3
+  _roomPrefab: {fileID: 8718320330909568007, guid: 2788c1ec058db0e448dea6c75699ea9a, type: 3}
