@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ac3af5374d246d48ab7fe0766cb213a, type: 3}
+  m_Name: WD_OldSword
+  m_EditorClassIdentifier: Assembly-CSharp::Arcana.Systems.WeaponData
+  _weaponName: 
+  _description: 
+  _weaponType: 0
+  _weaponGrade: 0
+  _attackDamage: 0
+  _attackSpeed: 0
+  _staminaCost: 0
+  _moveSpeedModifier: 0
+  _skillPool: []
+  _weaponPrefab: {fileID: 0}
+  _icon: {fileID: 0}
