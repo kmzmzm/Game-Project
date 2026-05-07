@@ -14,22 +14,28 @@ namespace Arcana.Core
     /// </summary>
     public class CameraController : MonoBehaviour
     {
-        [Header("Cinemachine 컴포넌트")]
-        [SerializeField] CinemachineCamera    virtualCamera;
-        [SerializeField] CinemachineImpulseSource impulseSource;
+        [Header("Cinemachine")]
+        [SerializeField] CinemachineCamera _virtualCamera;
 
         [Header("아이소메트릭 고정 각도")]
-        [SerializeField] float pitchAngle = 50f; // X축 — 아래를 내려보는 각도
-        [SerializeField] float yawAngle   = 45f; // Y축 — 카메라 방위각
+        [SerializeField] float _pitchAngle = 50f; // X축 — 아래를 내려보는 각도
+        [SerializeField] float _yawAngle   = 45f; // Y축 — 카메라 방위각
 
         [Header("셰이크 임펄스 강도")]
-        [SerializeField] float weakForce       = 0.5f;
-        [SerializeField] float mediumForce     = 1.0f;
-        [SerializeField] float strongForce     = 2.0f;
-        [SerializeField] float veryStrongForce = 3.5f;
+        [SerializeField] float _weakForce       = 0.5f;
+        [SerializeField] float _mediumForce     = 1.0f;
+        [SerializeField] float _strongForce     = 2.0f;
+        [SerializeField] float _veryStrongForce = 3.5f;
+
+        // 같은 GameObject에 부착 — Inspector 노출 불필요
+        CinemachineImpulseSource _impulseSource;
 
         void Awake()
         {
+            _impulseSource = GetComponent<CinemachineImpulseSource>();
+            if (_impulseSource == null)
+                Debug.LogWarning("[CameraController] CinemachineImpulseSource 컴포넌트를 찾을 수 없습니다.", this);
+
             ApplyIsometricAngle();
         }
 
@@ -41,8 +47,8 @@ namespace Arcana.Core
 
         void ApplyIsometricAngle()
         {
-            if (virtualCamera != null)
-                virtualCamera.transform.rotation = Quaternion.Euler(pitchAngle, yawAngle, 0f);
+            if (_virtualCamera != null)
+                _virtualCamera.transform.rotation = Quaternion.Euler(_pitchAngle, _yawAngle, 0f);
         }
 
         /// <summary>
@@ -51,7 +57,8 @@ namespace Arcana.Core
         /// </summary>
         public void SetTarget(Transform target)
         {
-            virtualCamera.Follow = target;
+            if (_virtualCamera != null)
+                _virtualCamera.Follow = target;
         }
 
         /// <summary>
@@ -59,15 +66,18 @@ namespace Arcana.Core
         /// </summary>
         public void TriggerShake(ShakeIntensity intensity)
         {
+            if (_impulseSource == null) return;
+
             float force = intensity switch
             {
-                ShakeIntensity.Weak       => weakForce,
-                ShakeIntensity.Medium     => mediumForce,
-                ShakeIntensity.Strong     => strongForce,
-                ShakeIntensity.VeryStrong => veryStrongForce,
+                ShakeIntensity.Weak       => _weakForce,
+                ShakeIntensity.Medium     => _mediumForce,
+                ShakeIntensity.Strong     => _strongForce,
+                ShakeIntensity.VeryStrong => _veryStrongForce,
+                _                         => _weakForce,
             };
 
-            impulseSource.GenerateImpulse(force);
+            _impulseSource.GenerateImpulse(force);
         }
     }
 }
