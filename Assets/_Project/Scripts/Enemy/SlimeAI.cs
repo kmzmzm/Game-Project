@@ -71,8 +71,7 @@ namespace Arcana.Enemy
         {
             StopAllCoroutines();
             agent.isStopped = true;
-            // GDD 7.2 골드 드롭 — GoldManager 구현 후 연결
-            Debug.Log($"[SlimeAI] 사망: 골드 {goldDrop} 드롭");
+            GoldManager.Instance?.AddGold(goldDrop);
             Destroy(gameObject, 2f);
         }
 
