@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47aeac2873d842f4fb107eb331f1668c, type: 3}
   m_Name: SD_HeavyStrike
   m_EditorClassIdentifier: Assembly-CSharp::Arcana.Systems.SkillData
-  _skillName: 
+  _skillName: SD_HeavyStrike
   _description: 
   _skillType: 0
   _cooldown: 0

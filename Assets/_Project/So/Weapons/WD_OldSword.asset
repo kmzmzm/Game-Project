@@ -12,14 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ac3af5374d246d48ab7fe0766cb213a, type: 3}
   m_Name: WD_OldSword
   m_EditorClassIdentifier: Assembly-CSharp::Arcana.Systems.WeaponData
-  _weaponName: 
+  _weaponName: WD_OldSword
   _description: 
   _weaponType: 0
   _weaponGrade: 0
-  _attackDamage: 0
-  _attackSpeed: 0
-  _staminaCost: 0
+  _attackDamage: 10
+  _attackSpeed: 0.5
+  _staminaCost: 10
   _moveSpeedModifier: 0
-  _skillPool: []
+  _skillPool:
+  - {fileID: 11400000, guid: 35543b96cef608d458c907f781a374ea, type: 2}
+  - {fileID: 11400000, guid: a070aa2601d0d304a9c9fb2670c7bbec, type: 2}
+  - {fileID: 11400000, guid: 3e25d11185106eb4ea92c62a59af8582, type: 2}
+  - {fileID: 11400000, guid: 86fb95ad9a263fc4c897a6c3aab4cc9e, type: 2}
+  - {fileID: 11400000, guid: 75d25d94813683d46aaa2f238a96875d, type: 2}
   _weaponPrefab: {fileID: 0}
   _icon: {fileID: 0}
