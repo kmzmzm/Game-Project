@@ -30,8 +30,7 @@ namespace Arcana.Systems
         [SerializeField] float _moveSpeedModifier;  // 이동속도 보정 (1.0 = 기본, 0.9 = 10% 감소)
 
         [Header("스킬 풀")]
-        // SkillData.cs 구현 후 List<SkillData>로 교체할 것
-        [SerializeField] List<ScriptableObject> _skillPool; // 스킬 풀 (3~5개 권장)
+        [SerializeField] List<SkillData> _skillPool; // 스킬 풀 (3~5개 권장)
 
         [Header("에셋")]
         [SerializeField] GameObject _weaponPrefab; // 플레이어에 장착할 무기 프리팹
@@ -47,7 +46,7 @@ namespace Arcana.Systems
         public float       MoveSpeedModifier => _moveSpeedModifier;
 
         // 읽기 전용으로 노출 — 외부에서 직접 수정 불가
-        public IReadOnlyList<ScriptableObject> SkillPool => _skillPool;
+        public IReadOnlyList<SkillData> SkillPool => _skillPool;
 
         public GameObject WeaponPrefab => _weaponPrefab;
         public Sprite     Icon         => _icon;
