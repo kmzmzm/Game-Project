@@ -25,7 +25,7 @@ namespace Arcana.Enemy
         [SerializeField] float hurtRecovery = 0.3f; // Hurt → Idle 복귀 시간 (초)
 
         [Header("감지")]
-        [SerializeField] LayerMask playerLayer;
+        [SerializeField] protected LayerMask playerLayer;
 
         protected float        currentHp;
         protected NavMeshAgent agent;

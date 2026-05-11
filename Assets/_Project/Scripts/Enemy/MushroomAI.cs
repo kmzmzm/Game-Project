@@ -13,27 +13,27 @@ namespace Arcana.Enemy
     public class MushroomAI : EnemyBase
     {
         [Header("버섯 - 유지 거리")]
-        [SerializeField] float _keepDistance = 5f;      // 플레이어와 유지할 후퇴 기준 거리
+        [SerializeField] float keepDistance = 5f;      // 플레이어와 유지할 후퇴 기준 거리
 
         [Header("버섯 - 포자 공격")]
-        [SerializeField] float _sporeAngle    = 30f;    // 3방향 포자 좌우 각도 간격
-        [SerializeField] float _sporeHitRadius = 0.5f;  // 포자 착탄 판정 반경 (OverlapSphere)
-        [SerializeField] float _attackCooldown = 2f;    // 포자 공격 간격 (초)
+        [SerializeField] float sporeAngle    = 30f;    // 3방향 포자 좌우 각도 간격
+        [SerializeField] float sporeHitRadius = 0.5f;  // 포자 착탄 판정 반경 (OverlapSphere)
+        [SerializeField] float attackCooldown = 2f;    // 포자 공격 간격 (초)
 
         [Header("버섯 - 사망 포자 폭발")]
-        [SerializeField] float _deathSporeRange  = 2f;  // 사망 시 포자 폭발 범위
-        [SerializeField] float _deathSporeDamage = 10f; // 사망 포자 데미지
+        [SerializeField] float deathSporeRange  = 2f;  // 사망 시 포자 폭발 범위
+        [SerializeField] float deathSporeDamage = 10f; // 사망 포자 데미지
 
         [Header("버섯 - 드롭")]
-        [SerializeField] int _goldDrop = 10;            // GDD 9.3 사망 시 골드 드롭
+        [SerializeField] int goldDrop = 10;            // GDD 9.3 사망 시 골드 드롭
 
-        bool _isAttacking;
+        bool isAttacking;
 
         // Idle: 제자리 고정
         protected override void OnIdle()
         {
             StopAllCoroutines();
-            _isAttacking = false;
+            isAttacking = false;
             agent.isStopped = true;
         }
 
@@ -41,14 +41,14 @@ namespace Arcana.Enemy
         protected override void OnChase()
         {
             StopAllCoroutines();
-            _isAttacking = false;
+            isAttacking = false;
             agent.isStopped = false;
         }
 
         // Attack: 포자 공격 코루틴 시작 (중복 실행 방지)
         protected override void OnAttack()
         {
-            if (_isAttacking) return;
+            if (isAttacking) return;
             StartCoroutine(SporeAttackRoutine());
         }
 
@@ -59,7 +59,7 @@ namespace Arcana.Enemy
             agent.isStopped = true;
 
             DeathSporeExplosion();
-            GoldManager.Instance?.AddGold(_goldDrop);
+            GoldManager.Instance?.AddGold(goldDrop);
 
             Destroy(gameObject, 2f);
         }
@@ -68,18 +68,18 @@ namespace Arcana.Enemy
         {
             base.Update();
 
-            // Chase / Attack 공통: _keepDistance보다 가까우면 플레이어 반대 방향으로 후퇴
+            // Chase / Attack 공통: keepDistance보다 가까우면 플레이어 반대 방향으로 후퇴
             if ((currentState == EnemyState.Chase || currentState == EnemyState.Attack)
                 && playerTransform != null)
             {
                 float dist = Vector3.Distance(transform.position, playerTransform.position);
 
-                if (dist < _keepDistance)
+                if (dist < keepDistance)
                 {
-                    // 플레이어 반대 방향으로 _keepDistance + 버퍼 지점을 목적지로 설정
+                    // 플레이어 반대 방향으로 keepDistance + 버퍼 지점을 목적지로 설정
                     Vector3 retreatDest = playerTransform.position
                         + (transform.position - playerTransform.position).normalized
-                        * (_keepDistance + 0.5f);
+                        * (keepDistance + 0.5f);
                     agent.isStopped = false;
                     agent.SetDestination(retreatDest);
                 }
@@ -94,15 +94,15 @@ namespace Arcana.Enemy
         // 포자 3방향 투척 코루틴 — 2초 간격으로 반복
         IEnumerator SporeAttackRoutine()
         {
-            _isAttacking = true;
+            isAttacking = true;
 
             while (currentState == EnemyState.Attack)
             {
                 LaunchSpores();
-                yield return new WaitForSeconds(_attackCooldown);
+                yield return new WaitForSeconds(attackCooldown);
             }
 
-            _isAttacking = false;
+            isAttacking = false;
         }
 
         // 플레이어 방향 기준 3방향 포자 투척 (임시 Physics.OverlapSphere 방식)
@@ -112,14 +112,14 @@ namespace Arcana.Enemy
             if (playerTransform == null) return;
 
             Vector3 toPlayer = (playerTransform.position - transform.position).normalized;
-            float[] angles = { -_sporeAngle, 0f, _sporeAngle };
+            float[] angles = { -sporeAngle, 0f, sporeAngle };
 
             foreach (float angle in angles)
             {
                 Vector3 dir      = Quaternion.AngleAxis(angle, Vector3.up) * toPlayer;
                 Vector3 hitCenter = transform.position + dir * attackRange;
 
-                Collider[] hits = Physics.OverlapSphere(hitCenter, _sporeHitRadius, playerLayer);
+                Collider[] hits = Physics.OverlapSphere(hitCenter, sporeHitRadius, playerLayer);
                 foreach (var col in hits)
                 {
                     if (col.TryGetComponent<IDamageable>(out var target))
@@ -131,11 +131,11 @@ namespace Arcana.Enemy
         // 사망 시 자신 위치 중심으로 포자 폭발
         void DeathSporeExplosion()
         {
-            Collider[] hits = Physics.OverlapSphere(transform.position, _deathSporeRange, playerLayer);
+            Collider[] hits = Physics.OverlapSphere(transform.position, deathSporeRange, playerLayer);
             foreach (var col in hits)
             {
                 if (col.TryGetComponent<IDamageable>(out var target))
-                    target.TakeDamage(_deathSporeDamage, transform.position);
+                    target.TakeDamage(deathSporeDamage, transform.position);
             }
         }
 
