@@ -104,7 +104,7 @@ namespace Arcana.Enemy
         }
 
         // 방어력 없음 — 데미지 그대로 적용
-        public void TakeDamage(float damage, Vector3 hitPoint)
+        public virtual void TakeDamage(float damage, Vector3 hitPoint)
         {
             if (currentState == EnemyState.Dead) return;
 
