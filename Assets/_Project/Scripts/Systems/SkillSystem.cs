@@ -12,7 +12,6 @@ namespace Arcana.Systems
     /// PlayerInput 컴포넌트와 동일한 GameObject에 부착해야 한다.
     /// </summary>
     [RequireComponent(typeof(WeaponSlotSystem))]
-    [RequireComponent(typeof(PlayerStats))]
     public class SkillSystem : MonoBehaviour
     {
         WeaponSlotSystem _weaponSlotSystem;
@@ -35,7 +34,9 @@ namespace Arcana.Systems
         void Awake()
         {
             _weaponSlotSystem = GetComponent<WeaponSlotSystem>();
-            _stats            = GetComponent<PlayerStats>();
+            _stats            = FindObjectOfType<PlayerStats>();
+            if (_stats == null)
+                Debug.LogWarning("[SkillSystem] PlayerStats를 찾을 수 없습니다. 스킬 스태미나 소모가 동작하지 않습니다.", this);
         }
 
         void OnEnable()
@@ -70,6 +71,7 @@ namespace Arcana.Systems
             if (skill == null)                            return;
             if (skill.SkillType == SkillType.Passive)    return; // 패시브는 수동 발동 불가
             if (_cooldownTimers[slotIndex] > 0f)         return; // 쿨다운 중
+            if (_stats == null)                          return; // PlayerStats 미연결
             if (_stats.CurrentStamina < skill.StaminaCost) return; // 스태미나 부족
 
             _stats.UseStamina(skill.StaminaCost);

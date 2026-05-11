@@ -11,7 +11,6 @@ namespace Arcana.Systems
     /// PlayerInput의 Send Messages 방식으로 Q키 입력(SwapWeapon 액션)을 수신한다.
     /// PlayerInput 컴포넌트와 동일한 GameObject에 부착해야 한다.
     /// </summary>
-    [RequireComponent(typeof(PlayerCombat))]
     public class WeaponSlotSystem : MonoBehaviour
     {
         // SaveData.baseWeaponLevel(0~5) 인덱스에 대응하는 기본 무기 목록
@@ -29,7 +28,9 @@ namespace Arcana.Systems
 
         void Awake()
         {
-            _combat = GetComponent<PlayerCombat>();
+            _combat = FindObjectOfType<PlayerCombat>();
+            if (_combat == null)
+                Debug.LogWarning("[WeaponSlotSystem] PlayerCombat을 찾을 수 없습니다. 공격력 갱신이 동작하지 않습니다.", this);
         }
 
         /// <summary>
@@ -77,7 +78,7 @@ namespace Arcana.Systems
 
             // 슬롯 A가 교체된 경우 PlayerCombat 공격력 즉시 갱신
             if (slot == 0 && weapon != null)
-                _combat.SetAttackDamage(weapon.AttackDamage);
+                _combat?.SetAttackDamage(weapon.AttackDamage);
 
             OnWeaponChanged?.Invoke(weapon, slot);
         }
@@ -92,7 +93,7 @@ namespace Arcana.Systems
             (_slotA, _slotB) = (_slotB, _slotA);
 
             // 교환 후 활성 무기(A)로 PlayerCombat 공격력 갱신
-            _combat.SetAttackDamage(_slotA.AttackDamage);
+            _combat?.SetAttackDamage(_slotA.AttackDamage);
 
             OnWeaponChanged?.Invoke(_slotA, 0);
             OnWeaponChanged?.Invoke(_slotB, 1);

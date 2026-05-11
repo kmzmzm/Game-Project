@@ -40,7 +40,7 @@ namespace Arcana.Enemy
         [SerializeField] float _chargeMaxDist   = 8f;       // 돌진 발동 최대 거리
         [SerializeField] float _chargeWindup    = 1f;       // 돌진 선딜 (초)
         [SerializeField] float _chargeDamage    = 35f;      // 돌진 데미지
-        [SerializeField] float _chargeKnockback = 8f;       // 돌진 넉백 강도
+        [SerializeField] float _chargeKnockback = 4f;       // 돌진 넉백 강도 (수평 전용)
         [SerializeField] float _chargeSpeed     = 12f;      // 돌진 이동 속도
         [SerializeField] float _chargeDuration  = 0.35f;    // 돌진 지속 시간 (초)
 
@@ -255,11 +255,13 @@ namespace Arcana.Enemy
                 if (col.TryGetComponent<IDamageable>(out var damageable))
                     damageable.TakeDamage(_chargeDamage, transform.position);
 
-                // 넉백: CharacterController를 즉시 밀기
+                // 넉백: 수평 방향(Y=0)으로만 밀기 — Y 포함 시 플레이어가 공중으로 날아가는 문제 발생
                 // TODO: PlayerController에 ApplyKnockback() 추가 후 교체 권장
                 if (col.TryGetComponent<CharacterController>(out var cc))
                 {
-                    Vector3 knockDir = (col.transform.position - transform.position).normalized;
+                    Vector3 knockDir = col.transform.position - transform.position;
+                    knockDir.y = 0f;  // 수직 성분 제거
+                    knockDir.Normalize();
                     cc.Move(knockDir * _chargeKnockback);
                 }
             }
