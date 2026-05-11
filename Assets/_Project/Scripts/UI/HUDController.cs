@@ -39,6 +39,29 @@ namespace Arcana.UI
             base.Awake();
         }
 
+        void Start()
+        {
+            if (_playerStats != null)
+            {
+                float hpFill = _playerStats.CurrentMaxHp > 0f
+                    ? _playerStats.CurrentHp / _playerStats.CurrentMaxHp : 0f;
+                _targetHpFill = hpFill;
+                if (_hpSlider != null) _hpSlider.value = hpFill;
+
+                float staminaFill = _playerStats.MaxStamina > 0f
+                    ? _playerStats.CurrentStamina / _playerStats.MaxStamina : 0f;
+                if (_staminaSlider != null) _staminaSlider.value = staminaFill;
+            }
+
+            if (GoldManager.Instance != null)
+            {
+                if (_goldText != null)
+                    _goldText.text = $"골드: {GoldManager.Instance.CurrentGold}";
+                if (_cursedFragmentText != null)
+                    _cursedFragmentText.text = $"잠식 파편: {GoldManager.Instance.CursedFragment}";
+            }
+        }
+
         void OnEnable()
         {
             if (_playerStats != null)
