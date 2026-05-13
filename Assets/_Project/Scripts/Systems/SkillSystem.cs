@@ -34,7 +34,7 @@ namespace Arcana.Systems
         void Awake()
         {
             _weaponSlotSystem = GetComponent<WeaponSlotSystem>();
-            _stats            = FindObjectOfType<PlayerStats>();
+            _stats            = FindAnyObjectByType<PlayerStats>();
             if (_stats == null)
                 Debug.LogWarning("[SkillSystem] PlayerStats를 찾을 수 없습니다. 스킬 스태미나 소모가 동작하지 않습니다.", this);
         }

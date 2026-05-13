@@ -95,8 +95,18 @@ namespace Arcana.Player
         void OnAttack(InputValue value)
         {
             if (_controller == null) return;
-            if (_controller.InputBlocked || _isAttacking) return;
-            if (_stats.CurrentStamina < attackStaminaCost) return;
+            if (_controller.InputBlocked)
+            {
+                return;
+            }
+            if (_isAttacking)
+            {
+                return;
+            }
+            if (_stats.CurrentStamina < attackStaminaCost)
+            {
+                return;
+            }
 
             _stats.UseStamina(attackStaminaCost);
             _controller.ResetStaminaDelay();
@@ -111,11 +121,9 @@ namespace Arcana.Player
             }
             else
             {
-                // 임시 처리 - 애니메이션 없을 때: 즉시 판정 호출
-                // OnAttackEnd는 히트박스 활성 구간 종료 후 지연 호출
-                // (즉시 호출 시 _isAttacking=false → HandleHit에서 데미지 처리 안 됨)
+                // 임시 처리 - 애니메이션 없을 때: 히트박스 활성화만 요청
+                // OnAttackEnd는 HitboxActiveRoutine 끝에서 호출됨
                 OnAttackHit();
-                StartCoroutine(DelayedAttackEnd());
             }
         }
 
@@ -149,6 +157,7 @@ namespace Arcana.Player
         }
 
         // 콤보 새 타격 시작: HashSet 초기화 → 히트박스 활성화 → 0.2초 후 비활성화
+        // Animator가 없을 때는 마지막에 OnAttackEnd()까지 호출해 _isAttacking을 유지함
         IEnumerator HitboxActiveRoutine()
         {
             _hitEnemies.Clear(); // 콤보 새 타격마다 초기화
@@ -157,13 +166,11 @@ namespace Arcana.Player
             yield return new WaitForSeconds(hitboxActiveDuration);
 
             attackHitbox.SetActive(false);
-        }
 
-        // 임시 처리 - 애니메이션 없을 때: 히트박스 활성 구간 종료 후 OnAttackEnd 호출
-        IEnumerator DelayedAttackEnd()
-        {
-            yield return new WaitForSeconds(hitboxActiveDuration);
-            OnAttackEnd();
+            // Animator 있음: 애니메이션 이벤트가 OnAttackEnd 호출
+            // Animator 없음: 여기서 호출해 히트박스 활성 구간 동안 _isAttacking = true 보장
+            if (_animator == null)
+                OnAttackEnd();
         }
 
         // AttackHitboxTrigger.OnHit 콜백 — enemyLayer 필터링 후 데미지 처리
@@ -173,7 +180,8 @@ namespace Arcana.Player
             if (((1 << other.gameObject.layer) & enemyLayer) == 0) return;
             if (!_hitEnemies.Add(other)) return; // 스윙당 동일 적은 한 번만 히트
 
-            if (other.TryGetComponent(out IDamageable target))
+            var target = other.GetComponentInParent<IDamageable>();
+            if (target != null)
             {
                 target.TakeDamage(_attackDamage, other.ClosestPoint(transform.position));
                 OnHitstopRequested?.Invoke(hitstopDuration);

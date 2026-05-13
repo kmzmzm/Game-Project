@@ -28,7 +28,7 @@ namespace Arcana.Systems
 
         void Awake()
         {
-            _combat = FindObjectOfType<PlayerCombat>();
+            _combat = FindAnyObjectByType<PlayerCombat>();
             if (_combat == null)
                 Debug.LogWarning("[WeaponSlotSystem] PlayerCombat을 찾을 수 없습니다. 공격력 갱신이 동작하지 않습니다.", this);
         }

@@ -53,13 +53,14 @@ namespace Arcana.UI
                 if (_staminaSlider != null) _staminaSlider.value = staminaFill;
             }
 
+            // GoldManager 구독은 Start에서 — 모든 Awake 완료 후라 Instance 보장됨
             if (GoldManager.Instance != null)
             {
-                if (_goldText != null)
-                    _goldText.text = $"골드: {GoldManager.Instance.CurrentGold}";
-                if (_cursedFragmentText != null)
-                    _cursedFragmentText.text = $"잠식 파편: {GoldManager.Instance.CursedFragment}";
+                GoldManager.Instance.OnGoldChanged           += HandleGoldChanged;
+                GoldManager.Instance.OnCursedFragmentChanged += HandleCursedFragmentChanged;
             }
+
+            RefreshAll();
         }
 
         void OnEnable()
@@ -72,12 +73,6 @@ namespace Arcana.UI
 
             if (_weaponSlotSystem != null)
                 _weaponSlotSystem.OnWeaponChanged += HandleWeaponChanged;
-
-            if (GoldManager.Instance != null)
-            {
-                GoldManager.Instance.OnGoldChanged           += HandleGoldChanged;
-                GoldManager.Instance.OnCursedFragmentChanged += HandleCursedFragmentChanged;
-            }
 
             // 활성화 시점에 현재 값으로 즉시 초기화
             RefreshAll();
@@ -125,14 +120,14 @@ namespace Arcana.UI
         void HandleGoldChanged(int amount)
         {
             if (_goldText != null)
-                _goldText.text = amount.ToString("N0");
+                _goldText.text = $"골드: {amount:N0}";
         }
 
         // 잠식 파편 변경 이벤트 핸들러
         void HandleCursedFragmentChanged(int amount)
         {
             if (_cursedFragmentText != null)
-                _cursedFragmentText.text = amount.ToString();
+                _cursedFragmentText.text = $"잠식 파편: {amount}";
         }
 
         // 무기 슬롯 변경 이벤트 핸들러 — 슬롯 A(0) / B(1) 아이콘 갱신
