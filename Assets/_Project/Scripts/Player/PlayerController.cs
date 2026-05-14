@@ -19,8 +19,13 @@ namespace Arcana.Player
         [SerializeField] float staminaRecoveryRate   = 20f;  // 초당 스태미나 회복량
         [SerializeField] float staminaRecoveryDelay  =  0.5f; // 행동 후 회복 시작까지 딜레이
 
+        [Header("마우스 회전")]
+        [SerializeField] float     rotationSpeed = 15f;   // Slerp 속도 (높을수록 빠름)
+        [SerializeField] LayerMask groundLayer;            // 바닥 Raycast 대상 레이어
+
         CharacterController _cc;
         PlayerStats         _stats;
+        Camera              _mainCamera;  // 매 프레임 Camera.main 호출 비용 절감
 
         Vector2  _moveInput;
         float    _staminaDelayTimer;
@@ -33,8 +38,9 @@ namespace Arcana.Player
 
         void Awake()
         {
-            _cc    = GetComponent<CharacterController>();
-            _stats = GetComponent<PlayerStats>();
+            _cc         = GetComponent<CharacterController>();
+            _stats      = GetComponent<PlayerStats>();
+            _mainCamera = Camera.main;
         }
 
         void Update()
@@ -42,6 +48,7 @@ namespace Arcana.Player
             if (!IsRolling)
                 HandleMovement();
 
+            UpdateMouseRotation();
             HandleStaminaRecovery();
         }
 
@@ -69,7 +76,30 @@ namespace Arcana.Player
 
             Vector3 worldDir = ToIsoDirection(_moveInput);
             _cc.SimpleMove(worldDir * moveSpeed);
-            transform.rotation = Quaternion.LookRotation(worldDir);
+            // 회전은 UpdateMouseRotation()이 전담 — 이동 방향과 시각 방향 분리
+        }
+
+        // 마우스 커서가 가리키는 바닥 지점을 향해 캐릭터 Y축만 회전
+        void UpdateMouseRotation()
+        {
+            if (InputBlocked || IsRolling) return;
+            if (_mainCamera == null) return;
+
+            Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
+            Ray ray = _mainCamera.ScreenPointToRay(mouseScreenPos);
+
+            if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, groundLayer))
+                return;  // Raycast 실패 시 마지막 방향 유지
+
+            Vector3 lookTarget = hit.point;
+            lookTarget.y = transform.position.y;  // Y축 고정 — 수평 회전만
+
+            Vector3 direction = lookTarget - transform.position;
+            if (direction.sqrMagnitude < 0.01f) return;  // 너무 가까우면 무시
+
+            Quaternion targetRot = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
         }
 
         void HandleStaminaRecovery()
@@ -121,10 +151,8 @@ namespace Arcana.Player
         // 아이소메트릭 카메라 forward/right를 수평면으로 투영해 입력 방향을 월드 방향으로 변환
         Vector3 ToIsoDirection(Vector2 input)
         {
-            Transform cam = Camera.main.transform;
-
-            Vector3 camForward = cam.forward;
-            Vector3 camRight   = cam.right;
+            Vector3 camForward = _mainCamera.transform.forward;
+            Vector3 camRight   = _mainCamera.transform.right;
             camForward.y = 0f;
             camRight.y   = 0f;
             camForward.Normalize();
